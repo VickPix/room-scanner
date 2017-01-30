@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style type="text/css">
+	#radar{
+	  position:relative;
+	  width:321px;
+	  height:321px;
+	  background:#222 url(http://i.stack.imgur.com/vY6Tl.png);
+	  border-radius:320px;
+	  overflow:hidden;
+	}
+	#rad{
+	  position:absolute;
+	  width:321px;
+	  height:321px; 
+	  background:url(http://i.stack.imgur.com/fbgUD.png);
+	}
+	.obj{
+	  background:#cf5;
+	  position:absolute;
+	  border-radius:10px;
+	  width:4px;
+	  height:4px;
+	  margin-top:-2px;
+	  margin-left:-2px;
+	  box-shadow:0 0 10px 5px rgba(100,255,0,0.5);
+	  opacity:0.2;
+	  /*transition-duration: 2s;*/
+	}
+</style>
+<meta charset=utf-8 />
+<title>JS Bin</title>
+</head>
+<body>
+  
+  <div id="radar">
+    <div id="rad"></div>
+    <div class="obj" data-x="120" data-y="65"></div>
+    <div class="obj" data-x="140" data-y="35"></div>
+    <div class="obj" data-x="220" data-y="55"></div>
+    <div class="obj" data-x="30" data-y="125"></div>
+  </div>
+
+  <script type="text/javascript">
+  // PicoCss
+var p = {
+
+    select: function (selector) {
+        this.value = Array.prototype.slice.call(document.querySelectorAll(selector));
+        return this;
+    },
+    each: [].forEach,
+    css: function (v) {
+        this.value = this.each.call(this.value, function (i) {
+            i.style.cssText = v;
+        });
+        return this;
+    },
+    att: function (a, v) {
+        this.value = this.each.call(this.value, function (i) {
+            i.setAttribute(a, v);
+        });
+        return this;
+    },
+    animate: function (time, scale, rotate, rotateX, rotateY, translateX, translateY, skewX, skewY) {
+        this.value = [].forEach.call(this.value, function (i) {
+            i.style.cssText = '-webkit-transition: all ' + time + 's ease-in-out; -webkit-transform: scale(' + scale + ') rotate(' + rotate + 'deg) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) translate(' + translateX + 'px, ' + translateY + 'px) skew(' + skewX + 'deg, ' + skewY + 'deg)';
+        });
+        return this;
+    },
+
+    on: function (type, fn) {
+        this.value = this.each.call(this.value, function (i) {
+            i.addEventListener(type, fn, false);
+        });
+        return this;
+    }
+
+};
+/*
+* Fader.js 0.3.3
+*
+* Copyright 2012, Lukas Alexandre, Tait Brown
+* Licensed under MIT
+*/var Fader={supportsTransitions:function(){var a=document.body||document.documentElement,b={MozTransition:"transitionend",WebkitTransition:"webkitTransitionEnd",KhtmlTransition:"KhtmlTransitionEnd",OTransition:"oTransitionEnd",msTransition:"MSTransitionEnd",transition:"transitionEnd"},c;for(c in b)if("string"==typeof a.style[c])return[c,b[c]];return!1}(),fadeOutWithId:function(a,b,c){Fader.fadeWithId(a,b,100,0,c)},fadeInWithId:function(a,b,c){Fader.fadeWithId(a,b,0,100,c)},fadeOutWithClass:function(a,b,c,d){Fader.fadeWithClass(a,b,c,100,0,d)},fadeInWithClass:function(a,b,c,d){Fader.fadeWithClass(a,b,c,0,100,d)},fadeOutElement:function(a,b,c){Fader.fadeElement(a,b,100,0,c)},fadeInElement:function(a,b,c){Fader.fadeElement(a,b,0,100,c)},fadeWithId:function(a,b,c,d,e){a=document.getElementById(a);Fader.executeFade(a,b,c,d,e)},fadeWithClass:function(a,b,c,d,e,f){a=document.getElementsByClassName(a)[b];Fader.executeFade(a,c,d,e,f)},fadeElement:function(a,b,c,d,e){Fader.executeFade(a,b,c,d,e)},executeFade:function(a,b,c,d,e){e=e||function(){};if(Fader.supportsTransitions)a.style.opacity=100===c?1:0,a.style[Fader.supportsTransitions[0]]="opacity "+1E3*b+"ms linear",a.style.opacity=100===d?1:0,a.addEventListener(Fader.supportsTransitions[1],e,!1);else{var f=c,g;g=d>=c?2:-2;var h=1E3*b/50,k=setInterval(function(){if(0<g&&f>=d||0>g&&f<=d)clearInterval(k),setTimeout(e,h);Fader.setAlpha(a,f);f+=g},h)}},setAlpha:function(a,b){a.style.filter="alpha(opacity="+b+")";a.style.opacity=b/100}};
+	/*!
+	 * ki.js v1.1.0 - 2015-10-06
+	 * Copyright (c) 2015 Denis Ciccale (@tdecs)
+	 * Released under MIT license
+	 */
+	!function(a,b,c,d){function e(c){b.push.apply(this,c&&c.nodeType?[c]:""+c===c?a.querySelectorAll(c):d)}$=function(b){return/^f/.test(typeof b)?/c/.test(a.readyState)?b():$(a).on("DOMContentLoaded",b):new e(b)},$[c]=e[c]=$.fn=e.fn={length:0,on:function(a,b){return this.each(function(c){c.addEventListener(a,b)})},off:function(a,b){return this.each(function(c){c.removeEventListener(a,b)})},each:function(a,c){return b.forEach.call(this,a,c),this},splice:b.splice}}(document,[],"prototype");
+
+	function fade(element) {
+	    var op = 1;  // initial opacity
+	    var timer = setInterval(function () {
+	        if (op <= 0.1){
+	            clearInterval(timer);
+	            //element.style.display = 'none';
+	        }
+	        element.style.opacity = op;
+	        element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+	        op -= op * 0.1;
+	    }, 100);
+	}
+
+	function unfade(element) {
+	    var op = 0.1;  // initial opacity
+	    element.style.display = 'block';
+	    var timer = setInterval(function () {
+	        if (op >= 1){
+	            clearInterval(timer);
+	        }
+	        element.style.opacity = op;
+	        element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+	        op += op * 0.1;
+	    }, 10);
+	}
+  </script>
+<script type="text/javascript">
+
+	$(function() {
+  
+    var $rad = $('#rad'),
+        $obj = $('.obj'),
+        deg = -90,
+        bg1 = "http://i.imgur.com/Wv7VX9B.png",
+        bg0 = "http://i.stack.imgur.com/fbgUD.png",
+        verso = 0,
+        rad = 160.5; //   = 321/2
+
+	$obj.each(function(el){
+	    //var data = el,
+	    //attrs = data.attributes,
+	    var pos = {X:el.attributes['data-x'].value, Y:el.attributes['data-y'].value},
+	    getAtan = Math.atan2(pos.X-rad, pos.Y-rad),
+	    getDeg = ~~(-getAtan/(Math.PI/180)+180);
+	    getDeg=(getDeg>90)?(getDeg-360):getDeg;
+	    el.style.left = pos.X+'px';
+	    el.style.top = pos.Y+'px';
+	    console.log(el,pos.X,pos.Y );
+	    el.setAttribute('data-atDeg', getDeg);
+	});
+
+
+    (function rotate() {   
+		$rad[0].style.transform= 'rotate('+ deg +'deg)';
+      	/*$('[data-atDeg]').each(function(el){
+      		if(el.attributes['data-atDeg'].value==deg) fade(el);
+      	});*/
+      	if($('[data-atDeg="'+deg+'"]').length){
+      		console.log($('[data-atDeg="'+deg+'"]')[0]);
+      		var d=$('[data-atDeg="'+deg+'"]')[0];
+      		//d.style.transition = '0s';
+      		d.style.opacity=1;
+      		setTimeout(function(){
+      			d.style.transition = '2s';
+      		},100);
+      		setTimeout(function(){
+      			d.style.opacity=.2;
+      		},200);
+      		d.style.transition = '0s';
+      	}
+      	//console.log($('[data-atDeg="'+deg+'"]'));
+
+
+        // LOOP 
+        setTimeout(function() {
+          if ((deg<-90) || (deg>90)){
+            verso=Math.abs(verso-1);
+            $rad[0].style.background ='url('+eval('bg'+verso)+')';
+            }
+          if (verso==0)
+            deg = ++deg%360;
+          else 
+            deg = --deg%360;
+            rotate();
+        }, 25);
+    })();
+});
+</script>
+</body>
+</html>

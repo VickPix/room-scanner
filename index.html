@@ -192,7 +192,6 @@
     //draw(res);
     update();
     //console.log($('#random')[0].checked);
-	//setTimeout(function(){draw([100,100,100,100,100,100,100,100,100,100,100,100,100,300,300,300,300,300,300,300,300,300,300,300,300,390,390,390,390]);},7000);
     function draw(res){
     	var p = $('.points')[0];
     	p.style.opacity = 0;
@@ -271,14 +270,7 @@
     	/*var arr=[],
     	timer = null,
     	interval = 8000;*/
-
-
-    	// controllo auto-update 
-    	/*if(1){
-
-    	}*/
     	var arr=[],url='';
-    	console.log($('#random')[0].checked);
     	if($('#random')[0].checked){ //se è random
     		// generazione automatica
 			for (var i=0; i<50; i++) {
@@ -288,12 +280,11 @@
     	}else{ // se richiede l'url
     		url= ($('#pseudo')[0].checked) ? 'https://chivalrous-guitar-9168.nanoscaleapi.io/getRandom': 'localhost';
     		nanoajax.ajax({url: url, method: 'GET', body: ''}, function (code, responseText, request) {
-    			console.log(code, responseText);
+    			//console.log(code, responseText);
     			arr=JSON.parse(responseText);
     			draw(JSON.parse(responseText));
 			});
     	}
-    	
     }
 });
 </script>

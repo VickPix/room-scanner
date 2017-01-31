@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style type="text/css">
 	#radar{
 		margin: auto;
@@ -14,18 +16,7 @@
 		/*overflow:hidden;*/
 	}
 	.points{transition: .2s;}
-	.small1 {
-		position: absolute;
-		top:17vw;
-		left: 17vw;
-		height: 8vw;
-		width: 16vw;
-		margin: 0 auto;
-		border-radius: 100vw 100vw 0 0;
-		border:3px solid #cf5;
-		box-shadow:0 0 10px 5px rgba(100,255,0,0.4);
-	  	opacity:0.3;
-	}
+
 	.pulse {
 		position: absolute;
 		transform-origin: bottom;
@@ -48,29 +39,33 @@
 	    	opacity: .4;
 	    }
 	}
-	.small2 {
+	.small1,.small2,.small3{
 		position: absolute;
+		margin: 0 auto;
+		border:3px solid #cf5;
+		opacity:0.3;
+		box-shadow:0 0 10px 5px rgba(100,255,0,0.4);
+	}
+	.small1 {
+		top:17vw;
+		left: 17vw;
+		height: 8vw;
+		width: 16vw;
+		border-radius: 100vw 100vw 0 0;
+	}
+	.small2 {
 		top:11vw;
 		left: 11vw;
 		height: 14vw;
 		width: 28vw;
-		margin: 0 auto;
 		border-radius: 100vw 100vw 0 0;
-		border:3px solid #cf5;
-		box-shadow:0 0 10px 5px rgba(100,255,0,0.4);
-		opacity:0.3;
 	}
 	.small3 {
-		position: absolute;
 		top:5vw;
 		left: 5vw;
 		height: 20vw;
 		width: 40vw;
-		margin: 0 auto;
 		border-radius: 100vw 100vw 0 0;
-		border:3px solid #cf5;
-		box-shadow:0 0 10px 5px rgba(100,255,0,0.4);
-		opacity:0.3;
 	}
 	.obj{
 		background:#cf5;
@@ -96,7 +91,6 @@
 	    	transform: scale(1.2);
 	    }
 	    6% {
-	    	opacity: 1;
 	    	transform: scale(1);
 	    }
 	    100%{
@@ -128,7 +122,6 @@
 		<div class="small1"></div>
 		<div class="small2"></div>
 		<div class="small3"></div>
-		<div id="rad2"></div>
 		<div class="points"></div>
 	</div>
 	<div class="options">
@@ -192,7 +185,7 @@
 	$(function() {
     var deg = -90,//partenza
     	px = (100 / document.documentElement.clientWidth),//per conversione in vw
-        verso = 0, // per andare avanti e indietro
+        //verso = 0, // per andare avanti e indietro
         rad = $('#radar')[0].clientWidth/2; //   dimensione del raggio
     update();
     function draw(res){
@@ -226,13 +219,9 @@
     	},200);
     };
 
-    var //arr=[],
-    	timer = null,
+    var timer = null,
     	interval = 10000;
-
-    $('#update,#sensor,#pseudo,#random').on('click',function(){
-    	update();
-    });
+    $('#update,#sensor,#pseudo,#random').on('click',function(){update();});
 
     $('#autoUp').on('click',function(){
     	if($('#autoUp')[0].checked){
@@ -253,9 +242,7 @@
     	console.log($('#random')[0].checked);
     	if($('#random')[0].checked){ //se è random
     		// generazione automatica
-			for (var i=0; i<50; i++) {
-			    arr.push((Math.round(Math.random() * i*400))%400);
-			}
+			for (var i=0; i<50; i++) arr.push((Math.round(Math.random() * i*400))%400);
 			draw(arr);
     	}else{ // se richiede l'url
     		url= ($('#pseudo')[0].checked) ? 'https://chivalrous-guitar-9168.nanoscaleapi.io/getRandom': 'localhost';
@@ -265,7 +252,6 @@
     			draw(JSON.parse(responseText));
 			});
     	}
-    	
     }
 });
 </script>

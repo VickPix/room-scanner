@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style type="text/css">
 	#radar{
 		margin: auto;
@@ -238,7 +240,7 @@
           if ((deg<-90) || (deg>90)) verso = Math.abs(verso-1);
           deg = (verso==0) ? ++deg%360 : --deg%360;
           rotate();
-        }, 50);
+        }, 25);
     })();
 
     var //arr=[],

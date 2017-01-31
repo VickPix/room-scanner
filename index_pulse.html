@@ -11,9 +11,9 @@
 		border: 4px solid #444;
 		border-radius: 100vw 100vw 0 0;
 		box-shadow:0 0 15px 5px rgba(100,100,100,0.3);
-		overflow:hidden;
+		/*overflow:hidden;*/
 	}
-	.points{transition: .3s;}
+	.points{transition: .2s;}
 	.small1 {
 		position: absolute;
 		top:17vw;
@@ -36,19 +36,18 @@
 		width: 40vw;
 		margin: 0 auto;
 		border-radius: 100vw 100vw 0 0;
-		/*border:3px solid #cf5;*/
-		box-shadow:0 0 5vw 5vw rgba(100,255,100,1);
+		box-shadow:0 0 5vw 2.5vw rgba(100,255,100,1);
 	  	opacity:0.4;
-	  	animation-name: example;
-    	animation-duration: 4s;
+    	animation: example 1.5s ease-in-out alternate infinite;
     	overflow: hidden;
 	}
 	@keyframes example {
-    from {
-    }
-    to {
-    }
-}
+	    0% {opacity: .2;
+	    }
+	    100%{
+	    	opacity: .4;
+	    }
+	}
 	.small2 {
 		position: absolute;
 		top:11vw;
@@ -73,17 +72,6 @@
 		box-shadow:0 0 10px 5px rgba(100,255,0,0.4);
 		opacity:0.3;
 	}
-	#rad2{
-		transform-origin: bottom;
-		background:#cf5;
-		position:absolute;
-		border-radius:10px;
-		left:25vw;
-		width:4px;
-		height:25vw;
-		box-shadow:0 0 15px 5px rgba(100,255,0,0.5);
-		opacity: 0.8;
-	}
 	.obj{
 		background:#cf5;
 		position:absolute;
@@ -92,12 +80,31 @@
 		height:.5vw;
 		margin-top:-2px;
 		margin-left:-2px;
-		box-shadow:0 0 10px 5px rgba(100,255,0,0.5);
+		box-shadow:0 0 1vw .5vw rgba(100,255,0,0.5);
 		opacity:0.2;
 		transition: 0s;
-		-webkit-transition-delay: 4s; /* Safari */
-    	transition-delay: 4s;
+    	animation: objpulse 15s linear infinite;
+    	overflow: hidden;
 	}
+	@keyframes objpulse {
+	    0% {
+	    	opacity: .1;
+	    	transform: scale(.5);
+	    }
+	    2% {
+	    	opacity: 1;
+	    	transform: scale(1.2);
+	    }
+	    6% {
+	    	opacity: 1;
+	    	transform: scale(1);
+	    }
+	    100%{
+	    	opacity: .2;
+	    	transform: scale(2.5);
+	    }
+	}
+
 	.options{
 		width: 80vw;
 		max-width: 960px;
@@ -117,6 +124,7 @@
 <body> 
 	<div class="header"></div>
 	<div id="radar">
+		<div class="pulse"></div>
 		<div class="small1"></div>
 		<div class="small2"></div>
 		<div class="small3"></div>
@@ -182,15 +190,11 @@
   </script>
 <script type="text/javascript">
 	$(function() {
-	//var res = [33,33,33,33,180,180,180,190,190,199,200,210,210,210,300,300,300,390,390,390,390]; //iniziale
     var deg = -90,//partenza
     	px = (100 / document.documentElement.clientWidth),//per conversione in vw
         verso = 0, // per andare avanti e indietro
         rad = $('#radar')[0].clientWidth/2; //   dimensione del raggio
-    //draw(res);
     update();
-    //console.log($('#random')[0].checked);
-	//setTimeout(function(){draw([100,100,100,100,100,100,100,100,100,100,100,100,100,300,300,300,300,300,300,300,300,300,300,300,300,390,390,390,390]);},7000);
     function draw(res){
     	var p = $('.points')[0];
     	p.style.opacity = 0;
@@ -207,39 +211,20 @@
 
 		    var $obj = $('.obj');
 			$obj.each(function(el){
-			    var pos = {X:el.attributes['data-x'].value, Y:el.attributes['data-y'].value},
-			    getAtan = Math.atan2(pos.X-rad, pos.Y-rad),
-			    getDeg = ~~(-getAtan/(Math.PI/180)+180);
-			    getDeg = (getDeg>90)?(getDeg-360):getDeg;
+			    var pos = {X:el.attributes['data-x'].value, Y:el.attributes['data-y'].value};
+			    //getAtan = Math.atan2(pos.X-rad, pos.Y-rad),
+			    //getDeg = ~~(-getAtan/(Math.PI/180)+180);
+			    //getDeg = (getDeg>90)?(getDeg-360):getDeg;
 			    el.style.left = (pos.X*px)+'vw';
 			    el.style.top = (pos.Y*px)+'vw';
 			    var color = getColor(el.attributes['data-value'].value)
 			    el.style.background = color;
-			    el.style.boxShadow = '0 0 10px 5px rgba('+hexToRgb(color).r+','+hexToRgb(color).g+',0,0.5)';
-			    el.setAttribute('data-atDeg', getDeg);
+			    el.style.boxShadow = '0 0 .5vw .25vw rgba('+hexToRgb(color).r+','+hexToRgb(color).g+',0,0.5)';
+			    //el.setAttribute('data-atDeg', getDeg);
 			});
 			p.style.opacity=1;
-    	},300);
+    	},200);
     };
-
-    (function rotate() {   
-    	var bar = $('#rad2')[0];
-		bar.style.transform = 'rotate('+ deg +'deg)';
-      	if($('[data-atDeg="'+deg+'"]').length){
-      		var d=$('[data-atDeg="'+deg+'"]')[0];
-      		d.style.opacity=1;
-      		setTimeout(function(){d.style.transition = 'all 4s ease-in-out 1s';},100);
-      		setTimeout(function(){d.style.opacity=.2;},200);
-      		d.style.transition = '0s';
-      	}
-      	bar.style.transform = 'rotate('+ deg +'deg)';
-        // LOOP 
-        setTimeout(function() {
-          if ((deg<-90) || (deg>90)) verso = Math.abs(verso-1);
-          deg = (verso==0) ? ++deg%360 : --deg%360;
-          rotate();
-        }, 50);
-    })();
 
     var //arr=[],
     	timer = null,
@@ -264,17 +249,6 @@
     });
 
     function update(){
-    	//http://myjson.com/obe25
-    	//https://chivalrous-guitar-9168.nanoscaleapi.io/getRandom
-    	/*var arr=[],
-    	timer = null,
-    	interval = 8000;*/
-
-
-    	// controllo auto-update 
-    	/*if(1){
-
-    	}*/
     	var arr=[],url='';
     	console.log($('#random')[0].checked);
     	if($('#random')[0].checked){ //se è random

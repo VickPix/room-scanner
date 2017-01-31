@@ -102,7 +102,7 @@
 		        <legend>PANNELLO DI CONTROLLO</legend>
 
 		        Random <input id="modeUp" checked="checked" type="radio" name="linguaggio" value="html"/>
-		        Sensore <input type="radio" disabled="disabled" name="linguaggio" value="css"/>
+		        Sensore <input type="radio" name="linguaggio" value="css"/>
 		        Auto-Update<input id="autoUp" name="html" type="checkbox" value="html"/><br/>
 		        <button id="update" type="button">UPDATE</button>
 		    </fieldset>
@@ -215,7 +215,7 @@
 
     var //arr=[],
     	timer = null,
-    	interval = 8000;
+    	interval = 10000;
 
     $('#update').on('click',function(){
     	update();
@@ -236,6 +236,7 @@
     });
 
     function update(){
+    	//http://myjson.com/obe25
     	/*var arr=[],
     	timer = null,
     	interval = 8000;*/
@@ -251,12 +252,15 @@
 			for (var i=0; i<50; i++) {
 			    arr.push((Math.round(Math.random() * i*400))%400);
 			}
+			draw(arr);
     	}else{ // se richiede il sensore
-    		/*nanoajax.ajax({url: 'https://api.myjson.com/bins/obe25', method: 'GET', body: ''}, function (code, responseText, request) {
-			    setTimeout(function(){draw(JSON.parse(responseText));},7000);
-			});*/
+    		nanoajax.ajax({url: 'https://chivalrous-guitar-9168.nanoscaleapi.io/getRandom', method: 'GET', body: ''}, function (code, responseText, request) {
+    			console.log(code, responseText);
+    			arr=JSON.parse(responseText);
+    			draw(JSON.parse(responseText));
+			});
     	}
-    	draw(arr);
+    	
     }
 });
 </script>

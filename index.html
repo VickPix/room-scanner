@@ -3,180 +3,261 @@
 <head>
 <style type="text/css">
 	#radar{
-	  position:relative;
-	  width:321px;
-	  height:321px;
-	  background:#222 url(http://i.stack.imgur.com/vY6Tl.png);
-	  border-radius:320px;
-	  overflow:hidden;
+		margin: auto;
+		position:relative;
+		width:50vw;
+		height:25vw;
+		background:#222;
+		border: 4px solid #444;
+		border-radius: 100vw 100vw 0 0;
+		box-shadow:0 0 15px 5px rgba(100,100,100,0.3);
+		overflow:hidden;
 	}
-	#rad{
-	  position:absolute;
-	  width:321px;
-	  height:321px; 
-	  background:url(http://i.stack.imgur.com/fbgUD.png);
+	.points{transition: .3s;}
+	.small1 {
+		position: absolute;
+		top:17vw;
+		left: 17vw;
+		height: 8vw;
+		width: 16vw;
+		margin: 0 auto;
+		border-radius: 120px 120px 0 0;
+		border:3px solid #cf5;
+		box-shadow:0 0 10px 5px rgba(100,255,0,0.4);
+	  	opacity:0.3;
+	}
+	.small2 {
+		position: absolute;
+		top:11vw;
+		left: 11vw;
+		height: 14vw;
+		width: 28vw;
+		margin: 0 auto;
+		border-radius: 200px 200px 0 0;
+		border:3px solid #cf5;
+		box-shadow:0 0 10px 5px rgba(100,255,0,0.4);
+		opacity:0.3;
+	}
+	.small3 {
+		position: absolute;
+		top:5vw;
+		left: 5vw;
+		height: 20vw;
+		width: 40vw;
+		margin: 0 auto;
+		border-radius: 300px 300px 0 0;
+		border:3px solid #cf5;
+		box-shadow:0 0 10px 5px rgba(100,255,0,0.4);
+		opacity:0.3;
+	}
+	#rad2{
+		transform-origin: bottom;
+		background:#cf5;
+		position:absolute;
+		border-radius:10px;
+		left:25vw;
+		width:4px;
+		height:25vw;
+		box-shadow:0 0 15px 5px rgba(100,255,0,0.5);
+		opacity: 0.8;
 	}
 	.obj{
-	  background:#cf5;
-	  position:absolute;
-	  border-radius:10px;
-	  width:4px;
-	  height:4px;
-	  margin-top:-2px;
-	  margin-left:-2px;
-	  box-shadow:0 0 10px 5px rgba(100,255,0,0.5);
-	  opacity:0.2;
-	  /*transition-duration: 2s;*/
+		background:#cf5;
+		position:absolute;
+		border-radius:10px;
+		width:.5vw;
+		height:.5vw;
+		margin-top:-2px;
+		margin-left:-2px;
+		box-shadow:0 0 10px 5px rgba(100,255,0,0.5);
+		opacity:0.2;
+		transition: 0s;
+		-webkit-transition-delay: 4s; /* Safari */
+    	transition-delay: 4s;
+	}
+	.options{
+		width: 80vw;
+		margin: auto;
+		text-align: center;
+		padding: 25px;
+		font-family: Segoe UI;
+		box-shadow:0 0 10px 5px rgba(0,0,0,0.2);
 	}
 </style>
 <meta charset=utf-8 />
-<title>JS Bin</title>
+<title>Scanner</title>
 </head>
-<body>
-  
-  <div id="radar">
-    <div id="rad"></div>
-    <div class="obj" data-x="120" data-y="65"></div>
-    <div class="obj" data-x="140" data-y="35"></div>
-    <div class="obj" data-x="220" data-y="55"></div>
-    <div class="obj" data-x="30" data-y="125"></div>
-  </div>
+<body> 
+	<div class="header"></div>
+	<div id="radar">
+		<div class="small1"></div>
+		<div class="small2"></div>
+		<div class="small3"></div>
+		<div id="rad2"></div>
+		<div class="points"></div>
+	</div>
+	<div class="options">
+		<form action="">
+		    <fieldset>
+		        <legend>PANNELLO DI CONTROLLO</legend>
+
+		        Random <input id="modeUp" checked="checked" type="radio" name="linguaggio" value="html"/>
+		        Sensore <input type="radio" disabled="disabled" name="linguaggio" value="css"/>
+		        Auto-Update<input id="autoUp" name="html" type="checkbox" value="html" checked="checked"/><br/>
+		        <button id="update" type="button" disabled="disabled">UPDATE</button>
+		    </fieldset>
+		</form>
+	</div>
+
 
   <script type="text/javascript">
-  // PicoCss
-var p = {
-
-    select: function (selector) {
-        this.value = Array.prototype.slice.call(document.querySelectorAll(selector));
-        return this;
-    },
-    each: [].forEach,
-    css: function (v) {
-        this.value = this.each.call(this.value, function (i) {
-            i.style.cssText = v;
-        });
-        return this;
-    },
-    att: function (a, v) {
-        this.value = this.each.call(this.value, function (i) {
-            i.setAttribute(a, v);
-        });
-        return this;
-    },
-    animate: function (time, scale, rotate, rotateX, rotateY, translateX, translateY, skewX, skewY) {
-        this.value = [].forEach.call(this.value, function (i) {
-            i.style.cssText = '-webkit-transition: all ' + time + 's ease-in-out; -webkit-transform: scale(' + scale + ') rotate(' + rotate + 'deg) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) translate(' + translateX + 'px, ' + translateY + 'px) skew(' + skewX + 'deg, ' + skewY + 'deg)';
-        });
-        return this;
-    },
-
-    on: function (type, fn) {
-        this.value = this.each.call(this.value, function (i) {
-            i.addEventListener(type, fn, false);
-        });
-        return this;
-    }
-
-};
-/*
-* Fader.js 0.3.3
-*
-* Copyright 2012, Lukas Alexandre, Tait Brown
-* Licensed under MIT
-*/var Fader={supportsTransitions:function(){var a=document.body||document.documentElement,b={MozTransition:"transitionend",WebkitTransition:"webkitTransitionEnd",KhtmlTransition:"KhtmlTransitionEnd",OTransition:"oTransitionEnd",msTransition:"MSTransitionEnd",transition:"transitionEnd"},c;for(c in b)if("string"==typeof a.style[c])return[c,b[c]];return!1}(),fadeOutWithId:function(a,b,c){Fader.fadeWithId(a,b,100,0,c)},fadeInWithId:function(a,b,c){Fader.fadeWithId(a,b,0,100,c)},fadeOutWithClass:function(a,b,c,d){Fader.fadeWithClass(a,b,c,100,0,d)},fadeInWithClass:function(a,b,c,d){Fader.fadeWithClass(a,b,c,0,100,d)},fadeOutElement:function(a,b,c){Fader.fadeElement(a,b,100,0,c)},fadeInElement:function(a,b,c){Fader.fadeElement(a,b,0,100,c)},fadeWithId:function(a,b,c,d,e){a=document.getElementById(a);Fader.executeFade(a,b,c,d,e)},fadeWithClass:function(a,b,c,d,e,f){a=document.getElementsByClassName(a)[b];Fader.executeFade(a,c,d,e,f)},fadeElement:function(a,b,c,d,e){Fader.executeFade(a,b,c,d,e)},executeFade:function(a,b,c,d,e){e=e||function(){};if(Fader.supportsTransitions)a.style.opacity=100===c?1:0,a.style[Fader.supportsTransitions[0]]="opacity "+1E3*b+"ms linear",a.style.opacity=100===d?1:0,a.addEventListener(Fader.supportsTransitions[1],e,!1);else{var f=c,g;g=d>=c?2:-2;var h=1E3*b/50,k=setInterval(function(){if(0<g&&f>=d||0>g&&f<=d)clearInterval(k),setTimeout(e,h);Fader.setAlpha(a,f);f+=g},h)}},setAlpha:function(a,b){a.style.filter="alpha(opacity="+b+")";a.style.opacity=b/100}};
-	/*!
-	 * ki.js v1.1.0 - 2015-10-06
-	 * Copyright (c) 2015 Denis Ciccale (@tdecs)
-	 * Released under MIT license
-	 */
+	//ki.js
 	!function(a,b,c,d){function e(c){b.push.apply(this,c&&c.nodeType?[c]:""+c===c?a.querySelectorAll(c):d)}$=function(b){return/^f/.test(typeof b)?/c/.test(a.readyState)?b():$(a).on("DOMContentLoaded",b):new e(b)},$[c]=e[c]=$.fn=e.fn={length:0,on:function(a,b){return this.each(function(c){c.addEventListener(a,b)})},off:function(a,b){return this.each(function(c){c.removeEventListener(a,b)})},each:function(a,c){return b.forEach.call(this,a,c),this},splice:b.splice}}(document,[],"prototype");
-
-	function fade(element) {
-	    var op = 1;  // initial opacity
-	    var timer = setInterval(function () {
-	        if (op <= 0.1){
-	            clearInterval(timer);
-	            //element.style.display = 'none';
-	        }
-	        element.style.opacity = op;
-	        element.style.filter = 'alpha(opacity=' + op * 100 + ")";
-	        op -= op * 0.1;
-	    }, 100);
+	// https://github.com/yanatan16/nanoajax
+	!function(t,e){function n(t){return t&&e.XDomainRequest&&!/MSIE 1/.test(navigator.userAgent)?new XDomainRequest:e.XMLHttpRequest?new XMLHttpRequest:void 0}function o(t,e,n){t[e]=t[e]||n}var r=["responseType","withCredentials","timeout","onprogress"];t.ajax=function(t,a){function s(t,e){return function(){c||(a(void 0===f.status?t:f.status,0===f.status?"Error":f.response||f.responseText||e,f),c=!0)}}var u=t.headers||{},i=t.body,d=t.method||(i?"POST":"GET"),c=!1,f=n(t.cors);f.open(d,t.url,!0);var l=f.onload=s(200);f.onreadystatechange=function(){4===f.readyState&&l()},f.onerror=s(null,"Error"),f.ontimeout=s(null,"Timeout"),f.onabort=s(null,"Abort"),i&&(o(u,"X-Requested-With","XMLHttpRequest"),e.FormData&&i instanceof e.FormData||o(u,"Content-Type","application/x-www-form-urlencoded"));for(var p,m=0,v=r.length;v>m;m++)p=r[m],void 0!==t[p]&&(f[p]=t[p]);for(var p in u)f.setRequestHeader(p,u[p]);return f.send(i),f},e.nanoajax=t}({},function(){return this}());
+	// rad to degrees
+	function toDegrees (angle) {
+	  return angle * (180 / Math.PI);
+	};
+	// degrees to rad
+	function toRadians (angle) {
+	  return angle * (Math.PI / 180);
+	};
+	// round number
+	var roundNumber = function(number, decimals) {
+	    decimals = decimals || 5;
+	    return Math.round(number * Math.pow(10, decimals)) / Math.pow(10, decimals);
+	};
+	// value to hex (2digits)
+	function toHex(d) {
+	    return  ("0"+(Number(d).toString(16))).slice(-2).toUpperCase()+'';
 	}
-
-	function unfade(element) {
-	    var op = 0.1;  // initial opacity
-	    element.style.display = 'block';
-	    var timer = setInterval(function () {
-	        if (op >= 1){
-	            clearInterval(timer);
-	        }
-	        element.style.opacity = op;
-	        element.style.filter = 'alpha(opacity=' + op * 100 + ")";
-	        op += op * 0.1;
-	    }, 10);
+	// hex to rgb
+	function hexToRgb(hex) {
+	    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+	    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+	        return r + r + g + g + b + b;
+	    });
+	    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	    return result ? {
+	        r: parseInt(result[1], 16),
+	        g: parseInt(result[2], 16),
+	        b: parseInt(result[3], 16)
+	    } : null;
+	}
+	// color green to red (verde  #00FF00 --- giallo #FFFF00 --- rosso  #FF0000)
+	function getColor(value){
+		var r = ( value <= 200 ) ? 255 : Math.min(255, 455-value),
+			g = ( value >= 200 ) ? 255 : Math.min(255, value),
+			b = '00';
+		return "#"+toHex(r)+''+toHex(g)+b;
 	}
   </script>
 <script type="text/javascript">
-
 	$(function() {
-  
-    var $rad = $('#rad'),
-        $obj = $('.obj'),
-        deg = -90,
-        bg1 = "http://i.imgur.com/Wv7VX9B.png",
-        bg0 = "http://i.stack.imgur.com/fbgUD.png",
-        verso = 0,
-        rad = 160.5; //   = 321/2
+	var res = [33,33,33,33,180,180,180,190,190,199,200,210,210,210,300,300,300,390,390,390,390]; //iniziale
+    var deg = -90,//partenza
+    	px = (100 / document.documentElement.clientWidth),//per conversione in vw
+        verso = 0, // per andare avanti e indietro
+        rad = $('#radar')[0].clientWidth/2; //   dimensione del raggio
+    draw(res);
+    console.log($('#modeUp')[0].checked);
+	//setTimeout(function(){draw([100,100,100,100,100,100,100,100,100,100,100,100,100,300,300,300,300,300,300,300,300,300,300,300,300,390,390,390,390]);},7000);
+    function draw(res){
+    	var p = $('.points')[0];
+    	p.style.opacity = 0;
+    	setTimeout(function(){
+    		p.innerHTML = '';
+    		res.forEach(function(val,i,x){
+		    	var atDeg=-90+(180/(x.length-1))*i,
+		    	prop = (rad*val)/400, //rad:x=400:val
+		    	posy = rad-(Math.sign(1))*roundNumber(prop*Math.cos(toRadians(atDeg))),
+		    	posx = rad+(Math.sign(1))*roundNumber(prop*Math.sin(toRadians(atDeg))),
+		    	newval = '<div id="obj'+i+'" class="obj" data-value="'+val+'" data-x="'+posx+'" data-y="'+posy+'"></div>';
+				$('.points')[0].innerHTML += newval;
+		    });
 
-	$obj.each(function(el){
-	    //var data = el,
-	    //attrs = data.attributes,
-	    var pos = {X:el.attributes['data-x'].value, Y:el.attributes['data-y'].value},
-	    getAtan = Math.atan2(pos.X-rad, pos.Y-rad),
-	    getDeg = ~~(-getAtan/(Math.PI/180)+180);
-	    getDeg=(getDeg>90)?(getDeg-360):getDeg;
-	    el.style.left = pos.X+'px';
-	    el.style.top = pos.Y+'px';
-	    console.log(el,pos.X,pos.Y );
-	    el.setAttribute('data-atDeg', getDeg);
-	});
-
+		    var $obj = $('.obj');
+			$obj.each(function(el){
+			    var pos = {X:el.attributes['data-x'].value, Y:el.attributes['data-y'].value},
+			    getAtan = Math.atan2(pos.X-rad, pos.Y-rad),
+			    getDeg = ~~(-getAtan/(Math.PI/180)+180);
+			    getDeg = (getDeg>90)?(getDeg-360):getDeg;
+			    el.style.left = (pos.X*px)+'vw';
+			    el.style.top = (pos.Y*px)+'vw';
+			    var color = getColor(el.attributes['data-value'].value)
+			    el.style.background = color;
+			    el.style.boxShadow = '0 0 10px 5px rgba('+hexToRgb(color).r+','+hexToRgb(color).g+',0,0.5)';
+			    el.setAttribute('data-atDeg', getDeg);
+			});
+			p.style.opacity=1;
+    	},300);
+    };
 
     (function rotate() {   
-		$rad[0].style.transform= 'rotate('+ deg +'deg)';
-      	/*$('[data-atDeg]').each(function(el){
-      		if(el.attributes['data-atDeg'].value==deg) fade(el);
-      	});*/
+    	var bar = $('#rad2')[0];
+		bar.style.transform = 'rotate('+ deg +'deg)';
       	if($('[data-atDeg="'+deg+'"]').length){
-      		console.log($('[data-atDeg="'+deg+'"]')[0]);
       		var d=$('[data-atDeg="'+deg+'"]')[0];
-      		//d.style.transition = '0s';
       		d.style.opacity=1;
-      		setTimeout(function(){
-      			d.style.transition = '2s';
-      		},100);
-      		setTimeout(function(){
-      			d.style.opacity=.2;
-      		},200);
+      		setTimeout(function(){d.style.transition = 'all 4s ease-in-out 1s';},100);
+      		setTimeout(function(){d.style.opacity=.2;},200);
       		d.style.transition = '0s';
       	}
-      	//console.log($('[data-atDeg="'+deg+'"]'));
-
-
+      	bar.style.transform = 'rotate('+ deg +'deg)';
         // LOOP 
         setTimeout(function() {
-          if ((deg<-90) || (deg>90)){
-            verso=Math.abs(verso-1);
-            $rad[0].style.background ='url('+eval('bg'+verso)+')';
-            }
-          if (verso==0)
-            deg = ++deg%360;
-          else 
-            deg = --deg%360;
-            rotate();
+          if ((deg<-90) || (deg>90)) verso = Math.abs(verso-1);
+          deg = (verso==0) ? ++deg%360 : --deg%360;
+          rotate();
         }, 25);
     })();
+
+    var //arr=[],
+    	timer = null,
+    	interval = 8000;
+
+    $('#update').on('click',function(){
+    	update();
+    });
+
+    $('#autoUp').on('click',function(){
+    	if($('#autoUp')[0].checked){
+    		update();
+    		$('#update')[0].disabled=true;
+    		timer = setInterval(function () {
+				update();
+			}, interval);
+    	}else{
+    		clearInterval(timer);
+      		timer = null
+      		$('#update')[0].disabled=false;
+    	}
+    });
+
+    function update(){
+    	/*var arr=[],
+    	timer = null,
+    	interval = 8000;*/
+
+
+    	// controllo auto-update 
+    	/*if(1){
+
+    	}*/
+    	var arr=[];
+    	if($('#modeUp')[0].checked){ //se è random
+    		// generazione automatica
+			for (var i=0; i<50; i++) {
+			    arr.push((Math.round(Math.random() * i*400))%400);
+			}
+    	}else{ // se richiede il sensore
+    		/*nanoajax.ajax({url: 'https://api.myjson.com/bins/obe25', method: 'GET', body: ''}, function (code, responseText, request) {
+			    setTimeout(function(){draw(JSON.parse(responseText));},7000);
+			});*/
+    	}
+    	draw(arr);
+    }
 });
 </script>
 </body>

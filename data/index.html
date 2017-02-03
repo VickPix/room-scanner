@@ -94,7 +94,7 @@
 		height:.5vw;
 		margin-top:-2px;
 		margin-left:-2px;
-		box-shadow:0 0 10px 5px rgba(100,255,0,0.5);
+		box-shadow:0 0 1vw .5vw rgba(100,255,0,0.5);
 		opacity:0.2;
 		transition: 0s;
 		-webkit-transition-delay: 4s; /* Safari */
@@ -140,6 +140,7 @@
 
 
   <script type="text/javascript">
+  var max_distance = 200;
 	//ki.js
 	!function(a,b,c,d){function e(c){b.push.apply(this,c&&c.nodeType?[c]:""+c===c?a.querySelectorAll(c):d)}$=function(b){return/^f/.test(typeof b)?/c/.test(a.readyState)?b():$(a).on("DOMContentLoaded",b):new e(b)},$[c]=e[c]=$.fn=e.fn={length:0,on:function(a,b){return this.each(function(c){c.addEventListener(a,b)})},off:function(a,b){return this.each(function(c){c.removeEventListener(a,b)})},each:function(a,c){return b.forEach.call(this,a,c),this},splice:b.splice}}(document,[],"prototype");
 	// https://github.com/yanatan16/nanoajax
@@ -176,19 +177,20 @@
 	}
 	// color green to red (verde  #00FF00 --- giallo #FFFF00 --- rosso  #FF0000)
 	function getColor(value){
-		var r = ( value <= 200 ) ? 255 : Math.min(255, 455-value),
-			g = ( value >= 200 ) ? 255 : Math.min(255, value),
+		var r = ( value <= (max_distance/2) ) ? 255 : Math.min(255, (max_distance+55)-value),
+			g = ( value >= (max_distance/2) ) ? 255 : Math.min(255, value),
 			b = '00';
 		return "#"+toHex(r)+''+toHex(g)+b;
 	}
   </script>
 <script type="text/javascript">
 	$(function() {
-	//var res = [33,33,33,33,180,180,180,190,190,199,200,210,210,210,300,300,300,390,390,390,390]; //iniziale
     var deg = -90,//partenza
     	px = (100 / document.documentElement.clientWidth),//per conversione in vw
+    	max_distance = 200;
         verso = 0, // per andare avanti e indietro
         rad = $('#radar')[0].clientWidth/2; //   dimensione del raggio
+
     //draw(res);
     update();
     //console.log($('#random')[0].checked);
@@ -199,7 +201,7 @@
     		p.innerHTML = '';
     		res.forEach(function(val,i,x){
 		    	var atDeg=-90+(180/(x.length-1))*i,
-		    	prop = (rad*val)/400, //rad:x=400:val
+		    	prop = (rad*val)/max_distance, //rad:x=400:val
 		    	posy = rad-(Math.sign(1))*roundNumber(prop*Math.cos(toRadians(atDeg))),
 		    	posx = rad+(Math.sign(1))*roundNumber(prop*Math.sin(toRadians(atDeg))),
 		    	newval = '<div id="obj'+i+'" class="obj" data-value="'+val+'" data-x="'+posx+'" data-y="'+posy+'"></div>';
@@ -216,7 +218,8 @@
 			    el.style.top = (pos.Y*px)+'vw';
 			    var color = getColor(el.attributes['data-value'].value)
 			    el.style.background = color;
-			    el.style.boxShadow = '0 0 10px 5px rgba('+hexToRgb(color).r+','+hexToRgb(color).g+',0,0.5)';
+			    console.log(color);
+			    el.style.boxShadow = '0 0 1vw .5vw rgba('+hexToRgb(color).r+','+hexToRgb(color).g+',0,0.5)';
 			    el.setAttribute('data-atDeg', getDeg);
 			});
 			p.style.opacity=1;
@@ -274,7 +277,7 @@
     	if($('#random')[0].checked){ //se è random
     		// generazione automatica
 			for (var i=0; i<50; i++) {
-			    arr.push((Math.round(Math.random() * i*400))%400);
+			    arr.push((Math.round(Math.random() * i*max_distance))%max_distance);
 			}
 			draw(arr);
     	}else{ // se richiede l'url
@@ -282,7 +285,11 @@
     		nanoajax.ajax({url: url, method: 'GET', body: ''}, function (code, responseText, request) {
     			//console.log(code, responseText);
     			arr=JSON.parse(responseText);
-    			draw(JSON.parse(responseText));
+    			for (var i = arr.length - 1; i >= 0; i--) {
+    				arr[i]=Math.min(arr[i],max_distance)-1;
+    			}
+    			console.log(arr);
+    			draw(arr);
 			});
     	}
     }

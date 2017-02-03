@@ -3,12 +3,18 @@
 #include <WiFiClient.h> 
 #include <ESP8266mDNS.h>
 #include "FS.h"
+#include <Servo.h>
 
 #define trigPin D5
 #define echoPin D6
+#define servoPin D7
+#define highPin D0
+#define modePin D1
+#define lowPin D2
+#define MAX_DISTANCE 300
 
 const char* ssid = "NON-SI-ENTRA";
-const char* password = "c1m1n0c454";
+const char* password = "123456789";
 long duration;
 int distance;
 bool autoConnect;
@@ -16,33 +22,38 @@ WiFiServer server2(80);
 ESP8266WebServer server(80);
 WiFiClient client;
 String HTTP_req;
+Servo scanServo;
+int pos=0;
 
 void setup() {
 
     pinMode(trigPin, OUTPUT); //t
     pinMode(echoPin, INPUT); //e
-    digitalWrite(trigPin,LOW);
+    
+    pinMode(highPin, OUTPUT);
+    pinMode(lowPin, OUTPUT);
+    pinMode(modePin, INPUT); 
+    
+    digitalWrite(trigPin,LOW); 
+    digitalWrite(highPin,HIGH);
+    digitalWrite(lowPin,LOW);
+
+    scanServo.attach(servoPin);
+    scanServo.write(0);
     
     Serial.begin(115200);
     SPIFFS.begin();
 
     setupWiFi();    
-    
+  
     // The root handler
     server.on("/", handleRoot);
     // Handlers for various user-triggered events
     server.on("/getRandom", getRandom);
     server.on("/pulse", pulseIndex);
-    
     // Start the server
     server.begin();
     Serial.println("Server started");
-    
-    /*// Print the IP address
-    Serial.print("Use this URL : ");
-    Serial.print("http://");
-    Serial.print(WiFi.localIP());
-    Serial.println("/");*/
 }
 
 void loop() {
@@ -50,7 +61,7 @@ void loop() {
 }
 
 void setupWiFi(){
-    WiFi.mode(WIFI_STA);
+    /*WiFi.mode(WIFI_STA);
     //WiFi.softAP ("Scanner", "123456789");
     //IPAddress IP = WiFi.softAPIP (); 
     //Serial.println(IP.toString());
@@ -65,9 +76,9 @@ void setupWiFi(){
     Serial.print("Connected to ");
     Serial.println(ssid);
     Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
+    Serial.println(WiFi.localIP());*/
 
-    /*int ret;
+    int ret;
     delay(500);
     ESP.eraseConfig();
     delay(500);
@@ -97,13 +108,13 @@ void setupWiFi(){
     } else {
       //WiFi.mode(WIFI_AP);
       Serial.println("Configuring access point...");
-      WiFi.softAP("ESP-TESTAP","123456789");
+      WiFi.softAP("ESP","123456789");
       WiFi.softAPIP();
       Serial.print("AP IP address "); 
       Serial.println(WiFi.softAPIP());
     }
   
-    Serial.println("Starting loop");*/
+    Serial.println("Starting loop");
 }
 
 void getTemperature(WiFiClient cl) {
@@ -130,6 +141,31 @@ int calculateDistance()
 }  
 
 void getRandom(){
+  int i = 0;
+  int passi = 90;
+  int distances[passi];
+  for(i=0; i<180; i += (180/passi)){
+    scanServo.write(i);
+    delay(20);
+  }
+  String s="[";
+  for (i = 180; i >= 0; i -= (180/passi)) { 
+    s+=String(calculateDistance());
+    s+=",";
+    scanServo.write(i);              
+    delay(25);                       
+  }
+  s+=String(calculateDistance()); 
+  s+="]";
+  server.send(200, "application/json", s);
+  /*for(i=0; i<180; i += (180/passi)){
+    scanServo.write(i);
+    delay(20);
+  }*/
+}
+
+void getRandom2(){
+  sendStatus();
   int passi = 50;
   int distances[passi];
   Serial.println("Start");
@@ -195,7 +231,6 @@ void pulseIndex() {
 
 // A function which sends the LED status back to the client
 void sendStatus() {
-//    if (ledStatus == HIGH) server.send(200, "text/plain", "HIGH");
-    //else server.send(200, "text/plain", "LOW");
+    Serial.println(digitalRead(modePin));
 }
 

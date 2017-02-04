@@ -188,25 +188,22 @@
     	//max_distance = 200;
         verso = 0, // per andare avanti e indietro
         rad = $('#radar')[0].clientWidth/2; //   dimensione del raggio
-    //draw(res);
     update();
-    //console.log($('#random')[0].checked);
     function draw(res){
-    	var p = $('.points')[0];
-    	p.style.opacity = 0;
+    	var p = $('.points')[0]; // recupero i punti già esistenti
+    	p.style.opacity = 0; // li nascondo
     	setTimeout(function(){
-    		p.innerHTML = '';
-    		res.forEach(function(val,i,x){
+    		p.innerHTML = ''; // elimino i punti esistenti
+    		res.forEach(function(val,i,x){ // per ognuno di quelli nuovi...
 		    	var atDeg=-90+(180/(x.length-1))*i,
 		    	prop = (rad*val)/(max_distance+(max_distance*0.05)), //rad:x=400:val
-
 		    	posy = rad-(Math.sign(1))*roundNumber(prop*Math.cos(toRadians(atDeg))),
 		    	posx = rad+(Math.sign(1))*roundNumber(prop*Math.sin(toRadians(atDeg))),
+		    	// calcolo la loro posizione in base all'angolo e li inserisco
 		    	newval = '<div id="obj'+i+'" class="obj" data-value="'+val+'" data-x="'+posx+'" data-y="'+posy+'"></div>';
-				//console.log(max_distance+(max_distance*0.05));
 				$('.points')[0].innerHTML += newval;
 		    });
-
+    		// a partire dai dati precedenti posiziono i nuovi punti sul radar
 		    var $obj = $('.obj');
 			$obj.each(function(el){
 			    var pos = {X:el.attributes['data-x'].value, Y:el.attributes['data-y'].value},
@@ -225,7 +222,7 @@
     	},300);
     };
 
-    (function rotate() {   
+    (function rotate() {   // ruota la barra del radar e fa visualizzare i punti
     	var bar = $('#rad2')[0];
 		bar.style.transform = 'rotate('+ deg +'deg)';
       	if($('[data-atDeg="'+deg+'"]').length){

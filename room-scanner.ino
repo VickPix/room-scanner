@@ -5,14 +5,15 @@
 #include "FS.h"
 #include <Servo.h>
 
-#define trigPin D5
-#define echoPin D6
-#define servoPin D7
-#define highPin D0
-#define modePin D1
-#define lowPin D2
-#define MAX_DISTANCE 300
+#define trigPin D5 // pin trigger ultrasuoni
+#define echoPin D6 // pin echo ultrasuoni
+#define servoPin D7 // pin di controllo servo
+#define highPin D0 // pin sempre alto
+#define modePin D1 // pin utilizzato per un controllo (alto/basso)
+#define lowPin D2 // pin sempre basso
+#define MAX_DISTANCE 300 // massima distanza stabilita
 
+// dichiarazioni
 const char* ssid = "NON-SI-ENTRA";
 const char* password = "123456789";
 long duration;
@@ -26,7 +27,7 @@ Servo scanServo;
 int pos=0;
 
 void setup() {
-
+    // inizializzazione dei pin
     pinMode(trigPin, OUTPUT); //t
     pinMode(echoPin, INPUT); //e
     pinMode(highPin, OUTPUT);
@@ -41,11 +42,14 @@ void setup() {
     scanServo.write(0);
     
     Serial.begin(115200);
+
+    // inizializzazione della partizione spiffs
     SPIFFS.begin();
 
+    // setup del wifi
     setupWiFi();    
   
-    // The root handler
+    // setup del server (index e chiamate asincrone)
     server.on("/", handleRoot);
     // Handlers for various user-triggered events
     server.on("/getRandom", getRandom);
@@ -117,8 +121,7 @@ void setupWiFi(){
     Serial.println("Starting loop");
 }
 
-int calculateDistance()
-{
+int calculateDistance(){ // calcolo della distanza con il sensore ultrasuoni
   digitalWrite(trigPin,LOW);
   delayMicroseconds(2);
   digitalWrite(trigPin,HIGH);
@@ -130,7 +133,7 @@ int calculateDistance()
   return distance;
 }  
 
-void getRandom(){
+void getRandom(){ // scansione delle distanze con il servo motore
   int i = 0;
   int passi = 90;
   int distances[passi];
@@ -189,7 +192,7 @@ void getRandom2(){
   server.send(200, "application/json", s);
 }
 
-void printJson(){
+void printJson(){ // test di stampa di un json
   String s = "HTTP/1.1 200 OK\r\n";
   s += "Access-Control-Allow-Origin: *\r\n";
   s += "Content-Type: text/plain\r\n\r\n";
@@ -198,21 +201,22 @@ void printJson(){
   server.send(200, "application/json", "[100,222,300,400]");
 }
 
-void handleRoot() {
+
+void handleRoot() { // index
     // Just serve the index page from SPIFFS when asked for
     File index = SPIFFS.open("/index.html", "r");
     server.streamFile(index, "text/html");
     index.close();
 }
 
-void pulseIndex() {
+void pulseIndex() { // index2
     // Just serve the index page from SPIFFS when asked for
     File index = SPIFFS.open("/index_pulse.html", "r");
     server.streamFile(index, "text/html");
     index.close();
 }
 
-// A function which sends the LED status back to the client
+
 void sendStatus() {
     Serial.println(digitalRead(modePin));
 }

@@ -128,9 +128,14 @@
 		<form action="">
 		    <fieldset>
 		        <legend>PANNELLO DI CONTROLLO</legend>
+		        <span>
+		        	Distanza massima
+		        	<input type="range" name="maxDist" id="maxDistId" value="200" step=10 min="10" max="400" oninput="maxDistLabelId.value = maxDistId.value">
+				    <output name="maxDistLabel" id="maxDistLabelId">200</output>
+				</span><br/>
 		        <span>Random <input id="random" type="radio" name="type" checked="checked" /></span>
 		        <span>Pseudo-Random <input id="pseudo" type="radio" name="type" /></span>
-		        <span>Sensore <input id="sensor" type="radio" name="type" disabled="disabled" /></span>
+		        <span>Sensore <input id="sensor" type="radio" name="type" /></span>
 		        <span>Auto-Update<input id="autoUp" type="checkbox" /></span><br/>
 		        <button id="update" type="button">UPDATE</button>
 		    </fieldset>
@@ -139,6 +144,7 @@
 
 
   <script type="text/javascript">
+  	var max_distance = 200;
 	//ki.js
 	!function(a,b,c,d){function e(c){b.push.apply(this,c&&c.nodeType?[c]:""+c===c?a.querySelectorAll(c):d)}$=function(b){return/^f/.test(typeof b)?/c/.test(a.readyState)?b():$(a).on("DOMContentLoaded",b):new e(b)},$[c]=e[c]=$.fn=e.fn={length:0,on:function(a,b){return this.each(function(c){c.addEventListener(a,b)})},off:function(a,b){return this.each(function(c){c.removeEventListener(a,b)})},each:function(a,c){return b.forEach.call(this,a,c),this},splice:b.splice}}(document,[],"prototype");
 	// https://github.com/yanatan16/nanoajax
@@ -175,8 +181,10 @@
 	}
 	// color green to red (verde  #00FF00 --- giallo #FFFF00 --- rosso  #FF0000)
 	function getColor(value){
-		var r = ( value <= 200 ) ? 255 : Math.min(255, 455-value),
-			g = ( value >= 200 ) ? 255 : Math.min(255, value),
+		// value : max_distance = newvalue : 255
+		value = (value*255)/max_distance;
+		var r = ( value <= (127.5) ) ? 255 : Math.round(256-(value))*2,
+			g = ( value >= (127.5) ) ? 255 : Math.round(value*2),
 			b = '00';
 		return "#"+toHex(r)+''+toHex(g)+b;
 	}
@@ -185,7 +193,6 @@
 	$(function() {
     var deg = -90,//partenza
     	px = (100 / document.documentElement.clientWidth),//per conversione in vw
-        //verso = 0, // per andare avanti e indietro
         rad = $('#radar')[0].clientWidth/2; //   dimensione del raggio
     update();
     function draw(res){
@@ -195,7 +202,7 @@
     		p.innerHTML = '';
     		res.forEach(function(val,i,x){
 		    	var atDeg=-90+(180/(x.length-1))*i,
-		    	prop = (rad*val)/400, //rad:x=400:val
+				prop = (rad*val)/(max_distance+(max_distance*0.05)), //rad:x=400:val
 		    	posy = rad-(Math.sign(1))*roundNumber(prop*Math.cos(toRadians(atDeg))),
 		    	posx = rad+(Math.sign(1))*roundNumber(prop*Math.sin(toRadians(atDeg))),
 		    	newval = '<div id="obj'+i+'" class="obj" data-value="'+val+'" data-x="'+posx+'" data-y="'+posy+'"></div>';
@@ -205,9 +212,6 @@
 		    var $obj = $('.obj');
 			$obj.each(function(el){
 			    var pos = {X:el.attributes['data-x'].value, Y:el.attributes['data-y'].value};
-			    //getAtan = Math.atan2(pos.X-rad, pos.Y-rad),
-			    //getDeg = ~~(-getAtan/(Math.PI/180)+180);
-			    //getDeg = (getDeg>90)?(getDeg-360):getDeg;
 			    el.style.left = (pos.X*px)+'vw';
 			    el.style.top = (pos.Y*px)+'vw';
 			    var color = getColor(el.attributes['data-value'].value)
@@ -237,19 +241,30 @@
     	}
     });
 
+    $('#maxDistId').on('change',function(){
+    	max_distance = parseInt($('#maxDistLabelId')[0].innerHTML);
+    	console.log($('#maxDistLabelId')[0].innerHTML);
+    });
+    
     function update(){
     	var arr=[],url='';
     	console.log($('#random')[0].checked);
     	if($('#random')[0].checked){ //se è random
     		// generazione automatica
-			for (var i=0; i<50; i++) arr.push((Math.round(Math.random() * i*400))%400);
+			for (var i=0; i<50; i++) {
+				num = ( Math.round( Math.random() * i*400 ) ) % 400;
+			    arr.push(Math.min(num,max_distance));
+			}
 			draw(arr);
     	}else{ // se richiede l'url
     		url= ($('#pseudo')[0].checked) ? 'https://chivalrous-guitar-9168.nanoscaleapi.io/getRandom': 'localhost';
     		nanoajax.ajax({url: url, method: 'GET', body: ''}, function (code, responseText, request) {
-    			console.log(code, responseText);
+    			//console.log(code, responseText);
     			arr=JSON.parse(responseText);
-    			draw(JSON.parse(responseText));
+    			for (var i = arr.length - 1; i >= 0; i--) {
+    				arr[i]=Math.min(arr[i],max_distance)-1;
+    			}
+    			draw(arr);
 			});
     	}
     }

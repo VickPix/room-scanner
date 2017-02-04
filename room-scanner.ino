@@ -29,7 +29,6 @@ void setup() {
 
     pinMode(trigPin, OUTPUT); //t
     pinMode(echoPin, INPUT); //e
-    
     pinMode(highPin, OUTPUT);
     pinMode(lowPin, OUTPUT);
     pinMode(modePin, INPUT); 
@@ -51,6 +50,7 @@ void setup() {
     // Handlers for various user-triggered events
     server.on("/getRandom", getRandom);
     server.on("/pulse", pulseIndex);
+    
     // Start the server
     server.begin();
     Serial.println("Server started");
@@ -96,7 +96,7 @@ void setupWiFi(){
     uint8_t timeout = 10; // 10 * 500 ms = 5 sec time out
     while ( ((ret = WiFi.status()) != WL_CONNECTED) && timeout-- ) {
       Serial.print(".");
-      delay(500);
+      delay(1000);
     }
   
     // connected ? disable AP, client mode only
@@ -117,16 +117,6 @@ void setupWiFi(){
     Serial.println("Starting loop");
 }
 
-void getTemperature(WiFiClient cl) {
-    delay(100);
-    distance=calculateDistance();
-    Serial.print(distance);
-    Serial.print("\n");
-    cl.print("Distance: ");
-    cl.print(distance);
-    cl.print(" cm");    
-}
-
 int calculateDistance()
 {
   digitalWrite(trigPin,LOW);
@@ -136,7 +126,7 @@ int calculateDistance()
   digitalWrite(trigPin,LOW);
   duration=pulseIn(echoPin,HIGH);
   distance=duration*0.034/2;
-  if(distance>400) return 400;
+  if(distance>MAX_DISTANCE) return MAX_DISTANCE;
   return distance;
 }  
 
@@ -158,10 +148,6 @@ void getRandom(){
   s+=String(calculateDistance()); 
   s+="]";
   server.send(200, "application/json", s);
-  /*for(i=0; i<180; i += (180/passi)){
-    scanServo.write(i);
-    delay(20);
-  }*/
 }
 
 void getRandom2(){
@@ -200,19 +186,16 @@ void getRandom2(){
   }
   s+=String(calculateDistance()); 
   s+="]";
-  
   server.send(200, "application/json", s);
 }
 
 void printJson(){
-  //First build the  response header
   String s = "HTTP/1.1 200 OK\r\n";
   s += "Access-Control-Allow-Origin: *\r\n";
   s += "Content-Type: text/plain\r\n\r\n";
   s += "[1,2,3,4]";
   Serial.print(s);
   server.send(200, "application/json", "[100,222,300,400]");
-  //return s;
 }
 
 void handleRoot() {

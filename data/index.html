@@ -182,6 +182,46 @@
 		return "#"+toHex(r)+''+toHex(g)+b;
 	}
 
+	function smoothings(arr,s){
+		console.log(arr.length);
+		var newArray = [],len=arr.length;
+		for(i = 0; i < len; i++){
+		    var sum = 0;
+		    for( j=i-s; j<=i+s; j++){
+		      	/*var c = i - s;
+			    if(c < 0){
+			        c += len;
+			    }
+			    if(c > len){
+			        c -= len;
+			    }*/
+			    var c= j>0 ? j+len : j % len;
+			    sum += arr[c];
+		    }
+		    newArray[i] = sum/((s*2)+1);
+		}
+		return newArray;
+	}
+
+	function smoothing(arr,s){
+		var newArray = [],
+		len = arr.length,
+		i = 0,
+		j = 0,
+		avg = 0,
+		max = Math.max(...arr);
+		q = 0.4;
+		for(i = 0; i < len; i++){
+			for(j = i-s; j <= i+s; j++){
+				var c = j > 0 ? Math.min(j,len-1) : Math.max(j,0);
+				avg += arr[c]/(s*2);
+			}
+			newArray[i] = Math.min(Math.round((avg * (1-q)) + (arr[i] * q)),max);
+			avg = 0;
+		}
+		return newArray;
+	}
+
 	$(function() {
     var deg = -90,//partenza
     	px = (100 / document.documentElement.clientWidth),//per conversione in vw
@@ -212,7 +252,8 @@
 			    getDeg = (getDeg>90)?(getDeg-360):getDeg;
 			    el.style.left = (pos.X*px)+'vw';
 			    el.style.top = (pos.Y*px)+'vw';
-			    var color = getColor(el.attributes['data-value'].value)
+			    var color = getColor(el.attributes['data-value'].value);
+			    console.log(el.attributes['data-value'].value, color);
 			    el.style.background = color;
 			    //console.log(el.attributes['data-value'].value,color);
 			    el.style.boxShadow = '0 0 .5vw .25vw rgba('+hexToRgb(color).r+','+hexToRgb(color).g+',0,0.5)';
@@ -278,22 +319,25 @@
     	var num=0;
     	if($('#random')[0].checked){ //se è random
     		// generazione automatica
+
 			for (var i=0; i<50; i++) {
-				num = ( Math.round( Math.random() * i*400 ) ) % 400;
+				num = ( Math.round( Math.random() *400 ) ) % 400;
 			    arr.push(Math.min(num,max_distance));
 			}
-			draw(arr);
+			console.log(arr);
+			draw(smoothing(arr,3));
     	}else{ // se richiede l'url
     		url= ($('#pseudo')[0].checked) ? 'https://chivalrous-guitar-9168.nanoscaleapi.io/getRandom': '/getRandom';
     		nanoajax.ajax({url: url, method: 'GET', body: ''}, function (code, responseText, request) {
-    			//console.log(code, responseText);
-    			arr=JSON.parse(responseText);
+    			console.log(JSON.parse(responseText));
+    			arr = smoothing(JSON.parse(responseText),3);
+    			console.log(arr);
     			for (var i = arr.length - 1; i >= 0; i--) {
     				arr[i]=Math.min(arr[i],max_distance)-1;
     			}
     			draw(arr);
 			});
-    	}console.log(arr);
+    	}//console.log(arr);
     }
 });
 </script>

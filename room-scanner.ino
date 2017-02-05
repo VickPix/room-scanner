@@ -14,7 +14,7 @@
 #define MAX_DISTANCE 300 // massima distanza stabilita
 
 // dichiarazioni
-const char* ssid = "NON-SI-ENTRA";
+const char* ssid = "test";
 const char* password = "123456789";
 long duration;
 int distance;
@@ -95,7 +95,7 @@ void setupWiFi(){
   
     // Get current autoconnect state from SDK
     autoConnect = WiFi.getAutoConnect();
-    WiFi.begin("NON-SI-ENTRA", "123456789");
+    WiFi.begin(ssid, password);
   
     uint8_t timeout = 10; // 10 * 500 ms = 5 sec time out
     while ( ((ret = WiFi.status()) != WL_CONNECTED) && timeout-- ) {
@@ -134,63 +134,42 @@ int calculateDistance(){ // calcolo della distanza con il sensore ultrasuoni
 }  
 
 void getRandom(){ // scansione delle distanze con il servo motore
-  int i = 0;
+  int i = 0, j = 0, it = 3;
+  int a,b=-1,aOld=-1;
   int passi = 90;
   int distances[passi];
   for(i=0; i<180; i += (180/passi)){
     scanServo.write(i);
-    delay(20);
+    delay(10);
   }
   String s="[";
   for (i = 180; i >= 0; i -= (180/passi)) { 
-    s+=String(calculateDistance());
-    s+=",";
-    scanServo.write(i);              
-    delay(25);                       
-  }
-  s+=String(calculateDistance()); 
-  s+="]";
-  server.send(200, "application/json", s);
-}
-
-void getRandom2(){
-  sendStatus();
-  int passi = 50;
-  int distances[passi];
-  Serial.println("Start");
-  //delay(1000);
-  int i;
-  
-  /*for(i=0;i<passi;i++){
-    distances[i]=calculateDistance();
-    delay(100);
-  }*/
-  Serial.println("End");
-  /*
-  for(i=1;i<passi-1;i++){
-    if(abs(distances[i-1]-distances[i+1])<30){
-      distances[i]=(distances[i-1]+distances[i+1])/2;
+    for(j=0;j<it;j++){
+      a += calculateDistance();
+      delay(15);
     }
-  }*/
-  /*
-  String s="[";
-  for(i=0;i<passi-1;i++){
-    s+=String(distances[i]);
+    a = a/it; 
+    
+    /*if( aOld >= 0){
+      b = (aOld+a)/2;
+      s += String(b);
+    }else{
+      b = a;
+    }*/
+    s += String(a);
+    //aOld=a;
+    
     s+=",";
-  }
-  s+=String(distances[passi-1]); 
-  s+="]";*/
-
- String s="[";
-  for(i=0;i<passi-1;i++){
-    s+=String(calculateDistance());
-    s+=",";
-    delay(100);
+    scanServo.write(i);
+    a=0;              
+    delay(10);                       
   }
   s+=String(calculateDistance()); 
   s+="]";
   server.send(200, "application/json", s);
 }
+
+
 
 void printJson(){ // test di stampa di un json
   String s = "HTTP/1.1 200 OK\r\n";

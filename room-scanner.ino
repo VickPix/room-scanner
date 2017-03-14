@@ -287,33 +287,33 @@ static unsigned char MOTION2[] PROGMEM ={
 };
 
 // dichiarazioni
-int pirState = LOW;
-int scanning = LOW;
+int pirState = LOW; // pir settato a zero
+int scanning = LOW; // scan settato a zero (inattivo)
 int val = 0;
-unsigned long t1,t2;
-long duration;
+unsigned long t1,t2; // variabili usate per il tempo
+long duration; // variabili usate per gli ultra suoni (non utilizzate)
 int distance;
-NewPing sonar(trigPin, echoPin, MAX_DISTANCE);
+NewPing sonar(trigPin, echoPin, MAX_DISTANCE); // sostituite da questo
 bool autoConnect;
 ESP8266WebServer server(80);
-String HTTP_req;
-Servo scanServo;
+String HTTP_req; 
+Servo scanServo; // oggetto servo
 int pos=0;
 
 void setup() {
     // inizializzazione dei pin
     pinMode(trigPin, OUTPUT); //t
-    pinMode(echoPin, INPUT); //e
-    pinMode(motionPin, INPUT);
+    pinMode(echoPin, INPUT);  //e
+    pinMode(motionPin, INPUT); //m
     
-    digitalWrite(trigPin,LOW); 
+    digitalWrite(trigPin,LOW); // imposto il trigger a zero
 
-    scanServo.attach(servoPin);
+    scanServo.attach(servoPin); // inizializzo il servo motore
     //delay(25);
-    scanServo.write(0);
-    resetPosition();
+    scanServo.write(0); // inizialmente setto l'angolo a zero
+    resetPosition(); // successivamente lo resetto nel modo migliore
     //delay(25);
-    pinMode(servoPin,INPUT);
+    pinMode(servoPin,INPUT); // in questo modo disattivo il servo (modalità riposo)
     
     Serial.begin(115200);
 
@@ -333,6 +333,7 @@ void setup() {
     server.on("/getRandom", getRandom);
     server.on("/pulse", pulseIndex);
     server.on("/motion", motionPage);
+    server.on("/getMotion", getMotion);
     
     // Start the server
     server.begin();
@@ -340,7 +341,9 @@ void setup() {
 }
 
 void loop() {
+	// gestione delle chiamate http
     server.handleClient();
+    // gestione del pir e disattivazione durante lo scanning
     val = digitalRead(motionPin);  
     if (val == HIGH && scanning == LOW) {        
       if (pirState == LOW) {
@@ -370,8 +373,6 @@ void setupWiFi(){
   WiFiManager wifiManager;
   //wifiManager.resetSettings();
   wifiManager.autoConnect("ScannerAP");
-  Serial.println("connected...yeey :)");
-  Serial.println(WiFi.softAPIP());
   Serial.println(WiFi.localIP());
   oled.clearDisplay();
   oled.putString(WiFi.localIP().toString());
@@ -379,7 +380,7 @@ void setupWiFi(){
   oled.drawBitmap(MOTION_EMPTY, 768);
 }
 
-int calculateDistance(){ // calcolo della distanza con il sensore ultrasuoni
+int calculateDistance(){ // calcolo della distanza con il sensore ultrasuoni (inutilizzato)
   digitalWrite(trigPin,LOW);
   delayMicroseconds(2);
   digitalWrite(trigPin,HIGH);
@@ -392,17 +393,17 @@ int calculateDistance(){ // calcolo della distanza con il sensore ultrasuoni
 }  
 
 void getRandom(){ // scansione delle distanze con il servo motore
-  int i = 0, j = 0, it = 5;
+  int i = 0, j = 0, it = 5; // it è il numero di scansioni per ogni posizione
   int a,b,aOld=-1;
-  int passi = 90;
-  int distances[passi];
-  pinMode(servoPin,OUTPUT);
-  scanning = HIGH;
-  oled.setTextXY(1,0);
+  int passi = 90; // numero di rilevamenti in 180 gradi (rilevamento ogni 2 gradi)
+  int distances[passi]; // array delle distanze
+  pinMode(servoPin,OUTPUT); // riattivo il servo
+  scanning = HIGH; // avvio la fase di scanning
+  oled.setTextXY(1,0); // notifico sul display
   oled.drawBitmap(SCANNING, 880);//768
   String s="[";
-  for (i = 180; i >= 0; i -= (180/passi)) { 
-    for(j=0;j<it;j++){
+  for (i = 180; i >= 0; i -= (180/passi)) { // ciclo per il numero di passi
+    for(j=0;j<it;j++){ // effettuo "it" scansioni ogni passo ed effettuo la media
       b = sonar.ping_cm();
       if(b==0) b=a/(j+1);
       a += b;
@@ -410,7 +411,7 @@ void getRandom(){ // scansione delle distanze con il servo motore
       Serial.print(String(b) + "\n");
     }
     a = a/it; 
-    s += String(a);    
+    s += String(a);    // intanto costruisco la stringa in formato JSON
     s+=",";
     scanServo.write(i);
     a=0;              
@@ -425,12 +426,12 @@ void getRandom(){ // scansione delle distanze con il servo motore
     a = a/it; 
   s+=String(a); 
   s+="]";
-  server.send(200, "application/json", s);
-  oled.setTextXY(1,0);
+  server.send(200, "application/json", s); // invio il JSON al richiedente come risposta HTTP
+  oled.setTextXY(1,0); // resetto il display
   oled.drawBitmap(MOTION_EMPTY, 880);
   resetPosition();
-  pinMode(servoPin,INPUT);
-  scanning = LOW;
+  pinMode(servoPin,INPUT); // metto il servo a riposo
+  scanning = LOW; // fine scanning
 }
 
 
@@ -444,7 +445,7 @@ void printJson(){ // test di stampa di un json
   server.send(200, "application/json", "[100,222,300,400]");
 }
 
-void resetPosition(){
+void resetPosition(){ // reset della posizione
   int i;
   for(i=0; i<180; i += (180/90)){
       scanServo.write(i);
@@ -471,7 +472,7 @@ void motionPage() { // motion
     motion.close();
 }
 
-void motionValue() {// motion
+void getMotion() {// motion
   t1 = millis();
   /*String s = "HTTP/1.1 200 OK\r\n";
   s += "Access-Control-Allow-Origin: *\r\n";

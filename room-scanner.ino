@@ -467,7 +467,7 @@ void pulseIndex() { // index2
 }
 
 void motionPage() { // motion
-    File motion = SPIFFS.open("/motion.html", "r");
+    File motion = SPIFFS.open("/index_motion.html", "r");
     server.streamFile(motion, "text/html");
     motion.close();
 }

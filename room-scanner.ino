@@ -408,7 +408,7 @@ void getRandom(){ // scansione delle distanze con il servo motore
       if(b==0) b=a/(j+1);
       a += b;
       delay(50);
-      Serial.print(String(b) + "\n");
+      //Serial.print(String(b) + "\n");
     }
     a = a/it; 
     s += String(a);    // intanto costruisco la stringa in formato JSON
@@ -441,7 +441,7 @@ void printJson(){ // test di stampa di un json
   s += "Access-Control-Allow-Origin: *\r\n";
   s += "Content-Type: text/plain\r\n\r\n";
   s += "[1,2,3,4]";
-  Serial.print(s);
+  //Serial.print(s);
   server.send(200, "application/json", "[100,222,300,400]");
 }
 
